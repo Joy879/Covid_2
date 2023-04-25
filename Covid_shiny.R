@@ -6,7 +6,7 @@ library(plotly)
 world1 <- map_data("world")
 
 ## Get Covid Data------------------------------------
-covid <- read.csv("Covid/WHO-COVID-19-global-data.csv")
+covid <- read.csv("data/WHO-COVID-19-global-data.csv")
 
 ## Create selection values --------------
 cases <- select(covid, New_cases:Cumulative_deaths)
