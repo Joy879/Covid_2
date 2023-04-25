@@ -36,9 +36,12 @@ ui <- dashboardPage(
                           "Case/Death distribution",
                           choices=colnames(cases)),
               dateInput("minimum_date", "Choose a Date:", value = "2020-04-29"),
+              ## TO DO: CHANGE TITLE TO BE BOLD AND CENTERED USING CSS/ANY OTHER TOOL
               textOutput("title1"),
               plotlyOutput("wmap"),
+              ## TO DO: CHANGE TITLE TO BE BOLD AND CENTERED USING CSS/ANY OTHER TOOL
               textOutput("title2"),
+              ## TO DO: CHANGE GRAPH TO BE ARRANGED IN DESCENDING ORDER
               plotlyOutput("reg1")),
       
     tabItem(tabName = "region",
@@ -75,10 +78,7 @@ ui <- dashboardPage(
                     plotlyOutput("reg7")
                   ))
               
-            # selectInput("location",
-            #             "WHO Region",
-            #             choices=unique(covid$WHO_region)),
-            # 
+            ## TO DO: ADD MORE SECTIONS TO ALSO ANALYZE VACCINATION TRENDS AND MAYBE INTRODUCE ANIMATION OF A CERTAIN PERIOD
             
            )
   )))
@@ -115,7 +115,8 @@ server <- function(input,output) {
     )))+geom_col()+ labs(y=input$case_death)+coord_flip()
     ggplotly(g, tootltip=c("text"))
   })
-    
+    ## TO DO: USE FUNCTIONS TO RECREATE THE REPEATED GRAPHS
+  ## TO DO: FIX BINS OF HISTOGRAMS TO BE MAYBE WEEKLY OR MONTHLY
   output$reg2 <- renderPlotly({
     g2<-covid%>% filter(WHO_region == 'EMRO')%>% ggplot(aes(y=get(input$case_death1), x=Date_reported, fill=WHO_region))+geom_col()+ labs(y=input$case_death1)
     ggplotly(g2)
