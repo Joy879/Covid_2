@@ -109,18 +109,22 @@ server <- function(input,output) {
     data1 <-select(covid, region=Country, Date_reported, input$case_death)
     data2 <- data1 %>% filter(Date_reported==input$minimum_date)
     mapdata <- left_join(world1, data2, by="region")
-    p<-mapdata%>% ggplot(aes(x = long, y = lat, text=paste(
-                                                           "Country: ", region, "<br>",
-                                                           input$case_death, get(input$case_death), "<br>"
-                                                           ))) + geom_polygon(aes(group=group, fill=get(input$case_death)))+ labs(title = glue('World map of {input$case_death} as at {input$minimum_date}'),fill=input$case_death) + coord_fixed(ratio=1)+ theme( axis.ticks = element_blank(),# remove the vertical grid lines
-                                                                 panel.grid.major.x = element_blank(),
-                                                                 panel.grid.major.y = element_blank(),
-                                                                 panel.background = element_blank(),
-                                                                 axis.text.x=element_blank(), #remove x axis labels
-                                                                 axis.ticks.x=element_blank(), #remove x axis ticks
-                                                                 axis.text.y=element_blank(),  #remove y axis labels
-                                                                 axis.ticks.y=element_blank(),  #
-                                                                 plot.title = element_text(hjust = 0.5))+ theme(text = element_text(family = "Times New Roman"))
+    p<-mapdata%>% ggplot(aes(x = long,
+                             y = lat, 
+                             text=paste("Country: ", region, "<br>",input$case_death, get(input$case_death), "<br>"))) + 
+    geom_polygon(aes(group=group,fill=get(input$case_death)))+ 
+    labs(title = glue('World map of {input$case_death} as at {input$minimum_date}'), fill=input$case_death) + 
+    coord_fixed(ratio=1)+ 
+    theme( axis.ticks = element_blank(),# remove the vertical grid lines
+           panel.grid.major.x = element_blank(),
+           panel.grid.major.y = element_blank(),
+           panel.background = element_blank(),
+           axis.text.x=element_blank(), #remove x axis labels
+           axis.ticks.x=element_blank(), #remove x axis ticks
+           axis.text.y=element_blank(),  #remove y axis labels
+           axis.ticks.y=element_blank(),  #
+           plot.title = element_text(hjust = 0.5))+ 
+    theme(text = element_text(family = "Times New Roman"))
     
     ggplotly(p, tooltip=c("text"))
   }) 
@@ -130,25 +134,31 @@ server <- function(input,output) {
   output$reg1 <- renderPlotly({
     res<- covid %>% filter(Date_reported == input$minimum_date) %>% group_by(WHO_region) %>%
       summarise(total = sum(get(input$case_death)))
-    g<-res%>%arrange(desc(total))%>%ggplot(aes(y=total,x=WHO_region, fill=WHO_region,text=paste(
-      "Date Reported: ", input$minimum_date, "<br>",
-      input$case_death, total, "<br>"
-    )))+geom_col()+ labs(title = glue('WHO Region total {input$case_death} as at {input$minimum_date}'),y=input$case_death)+coord_flip()+xlab("") + 
-      ylab("") +theme(plot.title = element_text(hjust = 0.5),panel.grid.major.x = element_blank(),
-                                                                                                                                               panel.grid.major.y = element_blank(),axis.text.x=element_blank(), #remove x axis labels
-                                                                                                                                               axis.ticks.x=element_blank(), #remove x axis ticks
-                                                                                                                                               axis.text.y=element_blank(),  #remove y axis labels
-                                                                                                                                               axis.ticks.y=element_blank(),
-            #
-                                                                                                                                               panel.background = element_blank())+theme(text = element_text(family = "Times New Roman"))
+    g<-res%>%arrange(desc(total))%>%ggplot(aes(y=total,
+                                               x=WHO_region,
+                                               fill=WHO_region,
+                                               text=paste("Date Reported: ", input$minimum_date, "<br>",input$case_death, total, "<br>")))+
+    geom_col()+ 
+    labs(title = glue('WHO Region total {input$case_death} as at {input$minimum_date}'),
+         y=input$case_death)+coord_flip()+
+    xlab("") + 
+    ylab("") +
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          axis.text.x=element_blank(), #remove x axis labels
+          axis.ticks.x=element_blank(), #remove x axis ticks
+          axis.text.y=element_blank(),  #remove y axis labels
+          axis.ticks.y=element_blank(),
+          panel.background = element_blank())+
+    theme(text = element_text(family = "Times New Roman"))
     ggplotly(g, tootltip=c("text"))
   })
   regiongraph <- function(region, years, cases, color){
     graph<-covid%>%subset(Year == years)%>%filter(WHO_region == region)%>%ggplot(aes(y=get(cases), x=Date_reported,text=paste(
       cases, get(cases), "<br>"
     )))+geom_col(fill=color)+labs(y=cases)+
-      theme( # remove the vertical grid lines
-        
+      theme( # remove the vertical grid
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_blank() )
     ggplotly(graph, tootltip=c("text"))
