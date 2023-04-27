@@ -1,19 +1,24 @@
+##-----------------Library imports---------------------------------------------------##
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
 library(plotly)
 library(glue)
-# #Obtain the world map --------------------------------------------
+## Also include this else dashboard deployment fails
+library(maps)
+
+
+##-------------------Obtain the world map --------------------------------------------##
 world1 <- map_data("world")
 
-## Get Covid Data------------------------------------
+##-------------------------Get Covid Data----------------------------------------------##
 covid <- read.csv("data/WHO-COVID-19-global-data.csv")
 
 covid$Month <- format(as.Date(covid$Date_reported), "%m")
 covid$Year <- format(as.Date(covid$Date_reported), "%Y")
 covid$Day <- format(as.Date(covid$Date_reported), "%d")
 covid$weekday <- wday(covid$Date_reported, label=TRUE, abbr=FALSE)
-## Create selection values --------------
+##-------------------------------Create selection values --------------------------------##
 cases <- select(covid, New_cases:Cumulative_deaths)
 
 
@@ -26,7 +31,6 @@ covid_max_date <- max(covid$Date_reported)
 ### Change font sizes of titles and ticks. Also look into themes
 ### Figure out how to get data directly from website
 ### Bring logic for different colors if cases/deaths/vaccinations
-### Fix breaking deployment issues
 ### Add vaccination data and add map visualization and color logic for that as well
 ### Look into proper mapping using leaflet/folium/choropleth
 
@@ -34,21 +38,25 @@ covid_max_date <- max(covid$Date_reported)
 ### Add logic to update the regions in descending order and rename regions to official names.
 ### Filter data to focus on vaccination ratio/infection ratio
 
-
+##-----------------------------UI Section-------------------------------------------------------------------------## 
 ui <- dashboardPage(
-  
+  # Header
   dashboardHeader(title="Covid Dashboard"),
+  # Sidebar
   dashboardSidebar(
     sidebarMenu(
       menuItem("World analysis",
                tabName="map"),
       menuItem("Per region analysis",
                tabName="region")
+      ## TODO add vaccination section either as a section or as part of the world and region analysis
     )
   ),
+  ## App content
   dashboardBody(
     tabItems(
       tabItem(tabName = "map",
+              ### Probably reduce size or use other widgets
               fluidRow(
                 box(selectInput("case_death",
                                 "Case/Death distribution",
@@ -59,7 +67,7 @@ ui <- dashboardPage(
               br(),
               br(),
               plotlyOutput("reg1")),
-      
+     # Region analysis. TODO: Add logic to sort graphs by region with most cases/deaths and show names and totals for each region 
     tabItem(tabName = "region",
             selectInput("case_death1",
                         "Case/Death distribution",
@@ -154,6 +162,8 @@ server <- function(input,output) {
     theme(text = element_text(family = "Times New Roman"))
     ggplotly(g, tootltip=c("text"))
   })
+  
+  ## Function to create per region bar graphs
   regiongraph <- function(region, years, cases, color){
     graph<-covid%>%subset(Year == years)%>%filter(WHO_region == region)%>%ggplot(aes(y=get(cases), x=Date_reported,text=paste(
       cases, get(cases), "<br>"
