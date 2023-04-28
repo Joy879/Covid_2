@@ -118,7 +118,7 @@ server <- function(input,output) {
                        fill=get(input$case_death)))+
       labs(title = glue('World map of {input$case_death} as at {input$minimum_date}'),
            fill=input$case_death) +
-      coord_fixed(ratio=5)+ 
+      coord_fixed(ratio=10)+ 
       theme( axis.ticks = element_blank(),
              # remove the vertical grid lines
              panel.grid.major.x = element_blank(),
