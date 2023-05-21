@@ -139,7 +139,7 @@ server <- function(input,output) {
   output$reg1 <- renderPlotly({
     res<- covid %>% filter(Date_reported == input$minimum_date) %>% group_by(WHO_region) %>%
       summarise(total = sum(get(input$case_death)))
-    g<-res%>%%>%ggplot(aes(y=total,
+    g<-res%>%ggplot(aes(y=total,
                            x=reorder(WHO_region, total),
                            fill=WHO_region,
                            text=paste("Date Reported: ", input$minimum_date, "<br>",
